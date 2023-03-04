@@ -3,9 +3,9 @@ package pl.tul.todosyncws.callback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.sync.diffsync.PersistenceCallback;
+import org.springframework.sync.diffsync.exception.ResourceNotFoundException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 public class JpaPersistenceCallback<T> implements PersistenceCallback<T> {
@@ -19,8 +19,9 @@ public class JpaPersistenceCallback<T> implements PersistenceCallback<T> {
     }
 
     @Override
-    public T findOne(String id) {
-        return repository.findById(Long.valueOf(id)).orElseThrow(NoSuchElementException::new);
+    public T findOne(String id) throws ResourceNotFoundException {
+        return repository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
     @Override
