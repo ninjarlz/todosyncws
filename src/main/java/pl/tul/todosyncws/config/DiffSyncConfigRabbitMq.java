@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.sync.diffsync.PersistenceCallbackRegistry;
 import org.springframework.sync.diffsync.config.DiffSyncConfigurerAdapter;
 import org.springframework.sync.diffsync.config.EnableDifferentialSynchronization;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import pl.tul.todosyncws.callback.JpaPersistenceCallback;
 import pl.tul.todosyncws.data.Todo;
 import pl.tul.todosyncws.repository.TodoRepository;
@@ -28,12 +29,19 @@ public class DiffSyncConfigRabbitMq extends DiffSyncConfigurerAdapter {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableStompBrokerRelay("/topic", "/queue")
-                .setRelayHost("localhost")
+                .setRelayHost("rabbitmq")
                 .setRelayPort(61613)
                 .setSystemLogin("admin")
                 .setSystemPasscode("admin")
                 .setClientLogin("admin")
                 .setClientPasscode("admin");
         config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        String path = String.format("/%s/websocket", diffSyncPath);
+        registry.addEndpoint(path).setAllowedOrigins("*");
+        registry.addEndpoint(path).setAllowedOrigins("*").withSockJS();
     }
 }

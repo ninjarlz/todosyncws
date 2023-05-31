@@ -11,8 +11,15 @@ services:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-      - rabbitmq_go_net
-
+      - bridge_net
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - bridge_net
+    links:
+      - rabbitmq
 networks:
-  rabbitmq_go_net:
+  bridge_net:
     driver: bridge
